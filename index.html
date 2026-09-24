@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DelayPay - EU261 Flight Compensation Checker</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#0c0a12; color:#efeaf7; min-height:100vh; }
+  .wrap { max-width:860px; margin:0 auto; padding:64px 24px 80px; }
+  .badge { display:inline-block; background:rgba(253,224,71,.12); color:#fde047; font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; padding:6px 14px; border-radius:999px; border:1px solid rgba(253,224,71,.25); margin-bottom:24px; }
+  h1 { font-size:clamp(38px,6vw,60px); line-height:1.05; font-weight:800; letter-spacing:-.02em; }
+  h1 .accent { background:linear-gradient(90deg,#fde047,#fbbf24); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { margin-top:20px; font-size:19px; line-height:1.6; color:#a89fb8; max-width:640px; }
+  .cta { display:inline-block; margin-top:36px; background:linear-gradient(90deg,#eab308,#f59e0b); color:#1a1305; font-size:17px; font-weight:800; padding:16px 34px; border-radius:14px; text-decoration:none; box-shadow:0 8px 30px rgba(245,158,11,.3); transition:transform .15s; }
+  .cta:hover { transform:translateY(-2px); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; margin-top:64px; }
+  .card { background:#151020; border:1px solid #2a2140; border-radius:16px; padding:24px; }
+  .card h3 { font-size:17px; margin-bottom:10px; color:#fff; }
+  .card p { font-size:14.5px; line-height:1.55; color:#9a90b0; }
+  .icon { font-size:26px; margin-bottom:12px; }
+  footer { margin-top:72px; text-align:center; color:#5c5470; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">DelayPay</span>
+  <h1>Your delayed flight<br><span class="accent">might owe you EUR 600.</span></h1>
+  <p class="sub">Millions in EU261 compensation goes unclaimed every year because checking eligibility feels like legal homework. Answer six questions, see exactly what you're owed, and get a ready-to-send claim letter in under a minute.</p>
+  <a class="cta" href="app.html">Check my flight</a>
+  <div class="grid">
+    <div class="card"><div class="icon">⚖️</div><h3>Real EU261 rules</h3><p>Route scope, distance bands, the 3-hour rule, the long-haul 50% reduction, and extraordinary-circumstance defenses - all baked in.</p></div>
+    <div class="card"><div class="icon">✍️</div><h3>Claim letter included</h3><p>A polite, legally-grounded letter with your flight details, pre-filled and ready to paste into the airline's form or email.</p></div>
+    <div class="card"><div class="icon">✈️</div><h3>Delays and cancellations</h3><p>Arrival delays over 3 hours, short-notice cancellations, and denied boarding - each handled by its own rules.</p></div>
+    <div class="card"><div class="icon">🗂️</div><h3>Claim tracker</h3><p>Save every claim you file, with amounts and dates, so follow-ups never fall through the cracks.</p></div>
+  </div>
+  <footer>Built by the App Factory - free, private, everything stays in your browser. Not legal advice.</footer>
+</div>
+</body>
+</html>
