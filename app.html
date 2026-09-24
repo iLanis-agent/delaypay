@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DelayPay - Check Your Flight</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#0c0a12; color:#efeaf7; min-height:100vh; }
+  .wrap { max-width:900px; margin:0 auto; padding:36px 20px 80px; }
+  header { display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; }
+  .logo { font-weight:800; font-size:20px; }
+  .logo span { color:#fde047; }
+  .home { color:#9a90b0; text-decoration:none; font-size:14px; }
+  .home:hover { color:#fff; }
+  .panel { background:#151020; border:1px solid #2a2140; border-radius:16px; padding:22px; margin-bottom:22px; }
+  label { display:block; font-size:12.5px; font-weight:600; color:#9a90b0; margin-bottom:6px; text-transform:uppercase; letter-spacing:.05em; }
+  input, select { width:100%; background:#0c0a12; border:1px solid #342a52; border-radius:10px; color:#efeaf7; padding:11px 12px; font-size:15px; outline:none; }
+  input:focus, select:focus { border-color:#eab308; }
+  .grid2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; }
+  .yn { display:flex; gap:8px; }
+  .yn button { flex:1; background:#0c0a12; border:1px solid #342a52; color:#9a90b0; font-size:14px; font-weight:700; padding:11px; border-radius:10px; cursor:pointer; }
+  .yn button.on { background:rgba(253,224,71,.14); border-color:#eab308; color:#fde047; }
+  button.go { margin-top:18px; width:100%; background:linear-gradient(90deg,#eab308,#f59e0b); border:0; color:#1a1305; font-size:16px; font-weight:800; padding:14px; border-radius:12px; cursor:pointer; }
+  .amount { font-size:clamp(48px,8vw,72px); font-weight:800; letter-spacing:-.02em; background:linear-gradient(90deg,#fde047,#fbbf24); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .amount.no { background:linear-gradient(90deg,#9a90b0,#6b6183); -webkit-background-clip:text; background-clip:text; }
+  .why { margin-top:8px; font-size:15.5px; color:#c9c0da; line-height:1.5; }
+  .eligible-tag { display:inline-block; font-size:12.5px; font-weight:800; padding:5px 12px; border-radius:999px; margin-bottom:10px; }
+  .eligible-tag.yes { background:rgba(74,222,128,.15); color:#4ade80; }
+  .eligible-tag.no { background:rgba(248,113,113,.15); color:#fca5a5; }
+  textarea { width:100%; min-height:320px; background:#0c0a12; border:1px solid #342a52; border-radius:10px; color:#efeaf7; padding:14px; font-size:14px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; line-height:1.55; }
+  .copy { margin-top:12px; background:transparent; border:1px solid #342a52; color:#fde047; font-size:14px; font-weight:700; padding:11px 20px; border-radius:10px; cursor:pointer; }
+  .copy:hover { border-color:#eab308; }
+  .claims-list div { display:flex; justify-content:space-between; padding:9px 4px; border-bottom:1px solid #241c3a; font-size:14px; color:#c9c0da; }
+  .hidden { display:none; }
+  .hint { font-size:12.5px; color:#5c5470; margin-top:6px; }
+  .seg-label { margin-bottom:14px; font-size:14px; font-weight:700; color:#efeaf7; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div class="logo">Delay<span>Pay</span></div><a class="home" href="index.html">&#8592; Home</a></header>
+
+  <div class="panel">
+    <div class="seg-label">1. Route</div>
+    <div class="grid2">
+      <div><label>Departed from EU/EEA/UK?</label><div class="yn" id="depEU"><button data-v="1">Yes</button><button data-v="0" class="on">No</button></div></div>
+      <div><label>Arrived in EU/EEA/UK?</label><div class="yn" id="arrEU"><button data-v="1" class="on">Yes</button><button data-v="0">No</button></div></div>
+      <div><label>EU/EEA/UK airline?</label><div class="yn" id="carrierEU"><button data-v="1" class="on">Yes</button><button data-v="0">No</button></div></div>
+      <div>
+        <label for="km">Route distance (km)</label>
+        <input type="number" id="km" min="100" step="50" value="3500">
+        <div class="hint">Rough is fine - only the band matters (under 1,500 / 1,500-3,500 / over 3,500).</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="seg-label">2. What happened</div>
+    <div class="grid2">
+      <div><label>Disruption type</label><div class="yn" id="dtype"><button data-v="delay" class="on">Delay</button><button data-v="cancel">Cancellation</button></div></div>
+      <div id="delayWrap"><label for="delayMin">Arrival delay (minutes)</label><input type="number" id="delayMin" min="0" step="15" value="210"></div>
+      <div id="noticeWrap" class="hidden"><label for="noticeDays">Days notice given</label><input type="number" id="noticeDays" min="0" step="1" value="3"></div>
+      <div>
+        <label for="reason">Reason given</label>
+        <select id="reason"></select>
+      </div>
+    </div>
+    <button class="go" id="check">Check my compensation</button>
+  </div>
+
+  <div class="panel hidden" id="verdictPanel">
+    <span class="eligible-tag" id="etag"></span>
+    <div class="amount" id="amount"></div>
+    <div class="why" id="why"></div>
+    <div class="hint" style="margin-top:10px">Care duties (meals, hotel, rebooking) apply regardless - keep receipts. This is guidance, not legal advice.</div>
+    <div id="letterCta" style="margin-top:16px"></div>
+  </div>
+
+  <div class="panel hidden" id="letterPanel">
+    <div class="seg-label">3. Your claim letter</div>
+    <div class="grid2">
+      <div><label for="flightNo">Flight number</label><input id="flightNo" placeholder="LY123"></div>
+      <div><label for="fdate">Flight date</label><input id="fdate" type="date"></div>
+      <div><label for="from">From</label><input id="from" placeholder="Tel Aviv"></div>
+      <div><label for="to">To</label><input id="to" placeholder="London"></div>
+      <div><label for="airline">Airline</label><input id="airline" placeholder="El Al"></div>
+      <div><label for="bookingRef">Booking reference</label><input id="bookingRef" placeholder="ABC123"></div>
+      <div><label for="pax">Passengers on booking</label><input id="pax" type="number" min="1" max="9" value="1"></div>
+      <div><label for="pname">Your name</label><input id="pname" placeholder="Your name"></div>
+    </div>
+    <div style="margin-top:14px"><textarea id="letter" readonly></textarea></div>
+    <button class="copy" id="copyBtn">Copy letter</button>
+    <button class="copy" id="saveClaim" style="margin-left:8px">Save to my claims</button>
+  </div>
+
+  <div class="panel hidden" id="claimsPanel">
+    <div class="seg-label">My saved claims</div>
+    <div class="claims-list" id="claimsList"></div>
+  </div>
+</div>
+<script src="engine.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var LS = 'delaypay-claims';
+  var toggles = { depEU: 0, arrEU: 1, carrierEU: 1, dtype: 'delay' };
+  var lastVerdict = null;
+
+  DelayEngine.REASONS.forEach(function (r) {
+    var o = document.createElement('option');
+    o.value = r.id; o.textContent = r.label + (r.extraordinary ? ' (likely extraordinary)' : '');
+    $('reason').appendChild(o);
+  });
+
+  document.querySelectorAll('.yn').forEach(function (yn) {
+    yn.addEventListener('click', function (e) {
+      if (e.target.tagName !== 'BUTTON') return;
+      yn.querySelectorAll('button').forEach(function (b) { b.classList.remove('on'); });
+      e.target.classList.add('on');
+      var v = e.target.getAttribute('data-v');
+      toggles[yn.id] = (yn.id === 'dtype') ? v : +v;
+      if (yn.id === 'dtype') {
+        $('delayWrap').classList.toggle('hidden', v === 'cancel');
+        $('noticeWrap').classList.toggle('hidden', v !== 'cancel');
+      }
+    });
+  });
+
+  function check() {
+    var cancelled = toggles.dtype === 'cancel';
+    lastVerdict = DelayEngine.verdict({
+      depEU: !!toggles.depEU, arrEU: !!toggles.arrEU, carrierEU: !!toggles.carrierEU,
+      km: parseFloat($('km').value) || 0,
+      delayMin: parseInt($('delayMin').value, 10) || 0,
+      cancelled: cancelled,
+      noticeDays: parseInt($('noticeDays').value, 10),
+      reasonId: $('reason').value
+    });
+    var v = lastVerdict;
+    $('verdictPanel').classList.remove('hidden');
+    $('etag').textContent = v.eligible ? 'Likely eligible' : 'Likely not eligible';
+    $('etag').className = 'eligible-tag ' + (v.eligible ? 'yes' : 'no');
+    $('amount').textContent = v.amount ? 'EUR ' + v.amount : 'EUR 0';
+    $('amount').className = 'amount' + (v.amount ? '' : ' no');
+    $('why').textContent = v.why;
+    $('letterCta').innerHTML = v.eligible
+      ? '<button class="go" id="toLetter">Write my claim letter</button>' : '';
+    if (v.eligible) $('toLetter').addEventListener('click', function () {
+      buildLetter();
+      $('letterPanel').classList.remove('hidden');
+      $('letterPanel').scrollIntoView({ behavior: 'smooth' });
+    });
+    if (!v.eligible) $('letterPanel').classList.add('hidden');
+    $('verdictPanel').scrollIntoView({ behavior: 'smooth' });
+  }
+  $('check').addEventListener('click', check);
+
+  function buildLetter() {
+    var cancelled = toggles.dtype === 'cancel';
+    $('letter').value = DelayEngine.claimLetter({
+      flightNo: $('flightNo').value || '[flight number]',
+      date: $('fdate').value || '[date]',
+      airline: $('airline').value,
+      from: $('from').value || '[origin]',
+      to: $('to').value || '[destination]',
+      bookingRef: $('bookingRef').value || '[booking ref]',
+      delayMin: parseInt($('delayMin').value, 10) || 0,
+      cancelled: cancelled,
+      noticeDays: cancelled ? (parseInt($('noticeDays').value, 10) || 0) : null,
+      km: parseFloat($('km').value) || 0,
+      amount: lastVerdict.amount,
+      passengers: parseInt($('pax').value, 10) || 1,
+      name: $('pname').value
+    });
+  }
+  ['flightNo','fdate','from','to','airline','bookingRef','pax','pname'].forEach(function (id) {
+    $(id).addEventListener('input', function () { if (lastVerdict && lastVerdict.eligible) buildLetter(); });
+  });
+
+  $('copyBtn').addEventListener('click', function () {
+    var done = function () { $('copyBtn').textContent = 'Copied!'; setTimeout(function () { $('copyBtn').textContent = 'Copy letter'; }, 1500); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText($('letter').value).then(done, done);
+    else { $('letter').select(); document.execCommand('copy'); done(); }
+  });
+
+  function renderClaims() {
+    var claims = [];
+    try { claims = JSON.parse(localStorage.getItem(LS) || '[]'); } catch (e) {}
+    if (!claims.length) { $('claimsPanel').classList.add('hidden'); return; }
+    $('claimsPanel').classList.remove('hidden');
+    $('claimsList').innerHTML = claims.map(function (c) {
+      return '<div><span>' + (c.flightNo || 'Flight') + ' - ' + c.date + '</span><span><b>EUR ' + (c.amount * c.passengers) + '</b> (' + c.passengers + ' pax)</span></div>';
+    }).join('');
+  }
+
+  $('saveClaim').addEventListener('click', function () {
+    var claims = [];
+    try { claims = JSON.parse(localStorage.getItem(LS) || '[]'); } catch (e) {}
+    claims.push({
+      flightNo: $('flightNo').value, date: $('fdate').value,
+      amount: lastVerdict.amount, passengers: parseInt($('pax').value, 10) || 1,
+      savedAt: Date.now()
+    });
+    try { localStorage.setItem(LS, JSON.stringify(claims)); } catch (e) {}
+    renderClaims();
+    $('saveClaim').textContent = 'Saved';
+    setTimeout(function () { $('saveClaim').textContent = 'Save to my claims'; }, 1500);
+  });
+
+  renderClaims();
+})();
+</script>
+</body>
+</html>
